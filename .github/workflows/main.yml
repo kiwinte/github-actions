@@ -15,9 +15,8 @@ jobs:
           role-to-assume: arn:aws:iam::228662049252:role/githubActions
           aws-region: us-east-1
 
-      - name: Deploy Lambda
-        run: |
-          zip -j function.zip ./lambda_function.py
-          aws lambda update-function-code \
-            --function-name github-actions \
-            --zip-file fileb://function.zip
+      - name: Deploy Lambda Function
+        uses: aws-actions/aws-lambda-deploy@v1
+        with:
+          function-name: my-lambda-function
+          code-artifacts-dir: ./dist
