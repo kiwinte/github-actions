@@ -11,21 +11,25 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        region: [us-east-1, us-west-2]  # Add your two regions here
     steps:
       - uses: actions/checkout@v4
       
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials for ${{ matrix.region }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::228662049252:role/githubActions
-          aws-region: us-east-1
+          aws-region: ${{ matrix.region }}
 
       - name: Zip Function
         run: |
           zip -j function.zip ./lambda_function.py  # Or your function file
 
-      - name: Deploy Lambda Function
+      - name: Deploy Lambda Function to ${{ matrix.region }}
         run: |
           aws lambda update-function-code \
             --function-name github-actions \
-            --zip-file fileb://function.zip
+            --zip-file fileb://function.zip \
+            --region ${{ matrix.region }}
