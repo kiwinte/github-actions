@@ -18,5 +18,5 @@ jobs:
       - name: Deploy Lambda Function
         uses: aws-actions/aws-lambda-deploy@v1
         with:
-          function-name: my-lambda-function
+          function-name: github-actions
           code-artifacts-dir: ./dist
