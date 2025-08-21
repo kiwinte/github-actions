@@ -39,3 +39,7 @@ jobs:
           VERSION=$(aws lambda publish-version --function-name github-actions --region ${{ matrix.region }} --query 'Version' --output text)
           echo "New version published: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update Alias
+        run: aws lambda update-alias --function-name github-actions --name prod --function-version ${{ steps.publish.outputs.version }} --region ${{ matrix.region }}
+
