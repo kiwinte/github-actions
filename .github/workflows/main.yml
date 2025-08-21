@@ -34,12 +34,18 @@ jobs:
             --zip-file fileb://function.zip \
             --region ${{ matrix.region }})
           
+      - name: Wait for Lambda Deployment
+        run: |
+         aws lambda wait function-updated \
+          --function-name github-actions
+          --region ${{ matrix.region }})
+         echo "Lambda function updated successfully."
+      
       - name: Publish New Version
         id: publish
         run: |
           VERSION=$(aws lambda publish-version \
-            --function-name my-lambda-function \
-            --description "Automated deployment from GitHub" \
+            --function-name github-actions \
             --region ${{ matrix.region }} \
             --query 'Version' --output text)
           echo "New version published: $VERSION"
