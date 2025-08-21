@@ -32,8 +32,15 @@ jobs:
           aws lambda update-function-code \
             --function-name github-actions \
             --zip-file fileb://function.zip \
-            --publish \
             --region ${{ matrix.region }})
           
-          VERSION=$(echo $RESPONSE | jq -r '.Version')
+      - name: Publish New Version
+        id: publish
+        run: |
+          VERSION=$(aws lambda publish-version \
+            --function-name my-lambda-function \
+            --description "Automated deployment from GitHub" \
+            --region ${{ matrix.region }} \
+            --query 'Version' --output text)
+          echo "New version published: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
