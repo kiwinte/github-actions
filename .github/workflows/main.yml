@@ -3,7 +3,6 @@ on:
   push:
     branches: [ main ]
 
-# Add this permissions block
 permissions:
   id-token: write    # Required for OIDC
   contents: read     # Required to checkout repository
@@ -13,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        region: [us-east-1, us-west-2]  # Add your two regions here
+        region: [us-east-1, us-west-2]
     steps:
       - uses: actions/checkout@v4
       
@@ -24,29 +23,19 @@ jobs:
           aws-region: ${{ matrix.region }}
 
       - name: Zip Function
-        run: |
-          zip -j function.zip ./lambda_function.py  # Or your function file
+        run: zip -j function.zip ./lambda_function.py
 
       - name: Deploy Lambda Function to ${{ matrix.region }}
-        run: |
-          aws lambda update-function-code \
-            --function-name github-actions \
-            --zip-file fileb://function.zip \
-            --region ${{ matrix.region }})
+        run: aws lambda update-function-code --function-name github-actions --zip-file fileb://function.zip --region ${{ matrix.region }}
           
       - name: Wait for Lambda Deployment
         run: |
-         aws lambda wait function-updated \
-          --function-name github-actions
-          --region ${{ matrix.region }})
-         echo "Lambda function updated successfully."
+          aws lambda wait function-updated --function-name github-actions --region ${{ matrix.region }}
+          echo "Lambda function updated successfully."
       
       - name: Publish New Version
         id: publish
         run: |
-          VERSION=$(aws lambda publish-version \
-            --function-name github-actions \
-            --region ${{ matrix.region }} \
-            --query 'Version' --output text)
+          VERSION=$(aws lambda publish-version --function-name github-actions --region ${{ matrix.region }} --query 'Version' --output text)
           echo "New version published: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
